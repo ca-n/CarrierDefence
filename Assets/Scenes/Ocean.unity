@@ -327,7 +327,7 @@ GameObject:
   - component: {fileID: 161560616}
   m_Layer: 0
   m_Name: HardBoundaryTrigger
-  m_TagString: Untagged
+  m_TagString: HardBoundary
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -878,7 +878,7 @@ GameObject:
   - component: {fileID: 1159177694}
   m_Layer: 0
   m_Name: SoftBoundaryTrigger
-  m_TagString: Untagged
+  m_TagString: SoftBoundary
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -932,7 +932,7 @@ GameObject:
   - component: {fileID: 1186641231}
   m_Layer: 0
   m_Name: CarrierTrigger
-  m_TagString: Untagged
+  m_TagString: CarrierTrigger
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

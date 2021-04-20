@@ -4,48 +4,64 @@ using UnityEngine;
 public class EnemyBomberBehaviour : EnemyBehaviour
 {
     [SerializeField] private GameObject bombPrefab;
-    [SerializeField] private long delayBetweenDrops;
+    [SerializeField] private float delayBetweenDrops;
+    private bool _bombing;
 
     protected new void Start()
     {
         base.Start();
         _rigidbody.useGravity = false;
-        _rigidbody.velocity = Vector3.forward * speed;
+        _rigidbody.velocity = transform.forward * speed;
+        _rigidbody.drag = 0;
     }
     
     private void OnTriggerEnter(Collider other)
     {
+        print(other.name + " entered");
         // Starts dropping bombs on approach to the carrier
-        if (other.CompareTag("CarrierTrigger"))
+        if (other.CompareTag("BomberAttackTrigger"))
         {
+            _bombing = true;
             InvokeRepeating(nameof(DropBomb), 0, delayBetweenDrops);
         }
-        // TODO: When I reach world boundary, destroy me.
     }
 
     private void DropBomb()
     {
+        if (!_bombing)
+        {
+            CancelInvoke(nameof(DropBomb));
+            return;
+        }
         GameObject bomb = Instantiate(bombPrefab);
+        bomb.transform.position = transform.position;
         Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
         bombRigidbody.velocity = _rigidbody.velocity;
+        bombRigidbody.AddForce(Vector3.down);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        // Stops dropping bombs after passing the carrier
-        if (other.CompareTag("CarrierTrigger"))
+        print(other.name + " exited");
+
+        if (other.CompareTag("HardBoundary"))
         {
-            CancelInvoke(nameof(DropBomb));
+            // When I reach the outer boundary, destroy me.
+            Destroy(gameObject);
         }
     }
 
     private void FixedUpdate()
     {
-        // TODO: Bomber flight characteristics
-        // Plan: Fly in a straight line over the origin
-        // the bombs will handle themselves
-        
-        // TODO: When shot down, fall out of the sky
-        // TODO: When shot down, emit smoke/fire
+        if (_bombing)
+        {
+            Vector3 pos = transform.position;
+            Vector3 origin = new Vector3(0f, pos.y, 0f);
+            float distance = Vector3.Distance(pos, origin);
+            if (distance < 10f)
+            {
+                _bombing = false;
+            }
+        }
     }
 }

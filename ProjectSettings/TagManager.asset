@@ -4,9 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - CarrierTrigger
   - SoftBoundary
   - HardBoundary
+  - BomberAttackTrigger
   layers:
   - Default
   - TransparentFX

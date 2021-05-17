@@ -37,7 +37,7 @@ public class EnemyBomberBehaviour : EnemyBehaviour
         bomb.transform.position = transform.position;
         Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
         bombRigidbody.velocity = _rigidbody.velocity;
-        bombRigidbody.AddForce(Vector3.down);
+        bombRigidbody.AddForce(Vector3.down * 5);
     }
 
     private void OnTriggerExit(Collider other)
@@ -53,6 +53,9 @@ public class EnemyBomberBehaviour : EnemyBehaviour
 
     private void FixedUpdate()
     {
+        // Ensures the plane is always pointing where it's going
+        transform.rotation.SetLookRotation(_rigidbody.velocity);
+        
         if (_bombing)
         {
             Vector3 pos = transform.position;

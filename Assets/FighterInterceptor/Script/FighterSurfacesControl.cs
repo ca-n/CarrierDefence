@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FighterSurfacesControl : MonoBehaviour
 {
-    public Texture2D tex;
+    //public Texture2D tex;
     public Transform rightElevator, leftElevator;
     public Transform rightFlap, leftFlap;
     public Transform rightRudder, leftRudder;
@@ -13,7 +13,6 @@ public class FighterSurfacesControl : MonoBehaviour
     public float rightElevatorSetAngle, leftElevatorSetAngle;
     public bool useMouse;
     public bool turnFlap;
-    private bool f;
     public float turnSpeed;
     private float angleX;
 	// Use this for initialization
@@ -31,19 +30,19 @@ public class FighterSurfacesControl : MonoBehaviour
 	    }
 	    else
 	    {
-            MRx = Mathf.Clamp(MRx + Input.GetAxis("Vertical") * 0.05f, -1f, 1f);
-            MRz = Mathf.Clamp(MRz - Input.GetAxis("Horizontal") * 0.05f, -1f, 1f);
-            MRy = Mathf.Clamp(MRy + Input.GetAxis("Yaw") * 0.05f, -1f, 1f);   
+            MRx = Mathf.Clamp(Input.GetAxis("Vertical"), -1f, 1f);
+            MRz = Mathf.Clamp(-Input.GetAxis("Horizontal"), -1f, 1f);
+            MRy = Mathf.Clamp(Input.GetAxis("Yaw"), -1f, 1f);   
 	    }
 	    if (!turnFlap)
         {
-            if (Input.GetKeyDown("f")) { turnFlap = true; f = false; }
+            if (Input.GetKeyDown("f")) { turnFlap = true; }
         }
         else
         {
             if (turnFlap)
             {
-                if (Input.GetKeyDown("f")) { turnFlap = false; f = true; }
+                if (Input.GetKeyDown("f")) { turnFlap = false; }
             }
         }
         rightElevator.transform.localRotation = Quaternion.Euler(new Vector3((MRz + MRx) * maxAngle, rightElevatorSetAngle, 0));
@@ -84,6 +83,6 @@ public class FighterSurfacesControl : MonoBehaviour
     }
     void OnGUI()
     {
-        GUI.DrawTexture(new Rect(Screen.width * 0.5f * (-MRz + 1f) - 8, Screen.height * 0.5f * (-MRx + 1f) - 8, 16f, 16f), tex);
+        //GUI.DrawTexture(new Rect(Screen.width * 0.5f * (-MRz + 1f) - 8, Screen.height * 0.5f * (-MRx + 1f) - 8, 32f, 32f), tex);
     }
 }

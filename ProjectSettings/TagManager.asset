@@ -8,6 +8,11 @@ TagManager:
   - HardBoundary
   - BomberAttackTrigger
   - Ocean
+  - EnemyAwacs
+  - Carrier
+  - EnemyHawkeye
+  - EnemySeahawk
+  - PlayerBullet
   layers:
   - Default
   - TransparentFX

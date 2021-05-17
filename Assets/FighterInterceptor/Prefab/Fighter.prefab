@@ -338,7 +338,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ef3bf5bd188d04a9dd9f0feb937108, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tex: {fileID: 0}
   rightElevator: {fileID: 4616544219842838}
   leftElevator: {fileID: 4612887498559300}
   rightFlap: {fileID: 4040824410442684}
@@ -680,7 +679,7 @@ GameObject:
   - component: {fileID: 4427129057575456}
   m_Layer: 0
   m_Name: Fighter
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -19,7 +19,7 @@ namespace Types
             }
         }
 
-        protected void OnDestroy()
+        protected virtual void OnDestroy()
         {
             if (Instance == this) Instance = null;
         }

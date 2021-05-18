@@ -41,9 +41,8 @@ namespace Managers
             }
         }
 
-        protected override void OnDestroy()
+        private void ClearGlobalInstances()
         {
-            base.OnDestroy();
             if (_globalInstances != null)
             {
                 foreach (GameObject instance in _globalInstances)
@@ -52,6 +51,12 @@ namespace Managers
                 }
                 _globalInstances.Clear();
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            ClearGlobalInstances();
         }
 
         private void LoadScene(string sceneName)
@@ -135,25 +140,20 @@ namespace Managers
         public void GameOver()
         {
             UpdateGameState(GameState.GameOver);
-            UnloadScene(GameScene);
         }
 
         public void RestartGame()
         {
-            UpdateGameState(GameState.MainMenu);
             UnloadScene(GameScene);
+            ClearGlobalInstances();
+            InstantiateGlobalPrefabs();
+            UpdateGameState(GameState.MainMenu);
         }
 
         public void QuitGame()
         {
             Debug.Log("Quitting game.");
             Application.Quit();
-        }
-
-        public void ResetGameScene()
-        {
-            UnloadScene(GameScene);
-            LoadScene(GameScene);
         }
     }
 }

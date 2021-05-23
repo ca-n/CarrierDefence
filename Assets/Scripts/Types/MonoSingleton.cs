@@ -21,6 +21,7 @@ namespace Types
 
         protected virtual void OnDestroy()
         {
+            Debug.Log("Destroying " + typeof(T));
             if (Instance == this) Instance = null;
         }
     }

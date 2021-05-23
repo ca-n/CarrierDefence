@@ -13,6 +13,8 @@ TagManager:
   - EnemyHawkeye
   - EnemySeahawk
   - PlayerBullet
+  - HeliAttackTrigger
+  - EnemyRocket
   layers:
   - Default
   - TransparentFX

@@ -48,5 +48,3 @@ MonoBehaviour:
       m_Calls: []
   globalPrefabs:
   - {fileID: 7820000499773585936, guid: add0572874f78eb4699ff3011e022477, type: 3}
-  - {fileID: 1942709924412699642, guid: c7c46655dea02ff4a852a2a36311d946, type: 3}
-  - {fileID: 2653145837719208657, guid: ce9da53bfe6d9894eb8e372cab81ec7c, type: 3}

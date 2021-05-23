@@ -22,7 +22,7 @@ namespace Managers
         private void Start()
         {
             Score = 0;
-            onScoreUpdated.AddListener(UIManager.Instance.UpdateScoreText);
+            onScoreUpdated.AddListener(UIManager.Instance.HandleScoreUpdated);
             GunLevel = 1;
             BulletLevel = 1;
             FireRateLevel = 1;
@@ -47,54 +47,36 @@ namespace Managers
             onScoreUpdated.Invoke(Score);
         }
 
+        public int GetUpgradeGunsCost() => GunUpgradeCost * GunLevel;
+        public int GetUpgradeBulletsCost() => BulletUpgradeCost * BulletLevel;
+        public int GetUpgradeFireRateCost() => FireRateUpgradeCost * FireRateLevel;
+
         public void UpgradeGuns()
         {
             if (GunLevel == 3) return;
-            //TODO: If Guns at max level, hide button.
-            if (Score < GunUpgradeCost * GunLevel)
-            {
-                //TODO: Display not enough points
-            }
-            else
-            {
-                Score -= GunUpgradeCost * GunLevel;
-                onScoreUpdated.Invoke(Score);
-                ++GunLevel;
-                FighterManager.Instance.UpgradeGuns(GunLevel);
-                //TODO: Display success
-            }
+            if (Score < GetUpgradeGunsCost()) return;
+            Score -= GunUpgradeCost * GunLevel;
+            onScoreUpdated.Invoke(Score);
+            ++GunLevel;
+            FighterManager.Instance.UpgradeGuns(GunLevel);
         }
 
         private void UpgradeBullets()
         {
-            if (Score < BulletUpgradeCost * BulletLevel)
-            {
-                //TODO: Display not enough points
-            }
-            else
-            {
-                Score -= BulletUpgradeCost * BulletLevel;
-                onScoreUpdated.Invoke(Score);
-                ++BulletLevel;
-                FighterManager.Instance.UpgradeBulletDamage(BulletLevel);
-                //TODO: Display success
-            }
+            if (Score < GetUpgradeBulletsCost()) return;
+            Score -= BulletUpgradeCost * BulletLevel;
+            onScoreUpdated.Invoke(Score);
+            ++BulletLevel;
+            FighterManager.Instance.UpgradeBulletDamage(BulletLevel);
         }
 
         private void UpgradeFireRate()
         {
-            if (Score < FireRateUpgradeCost * FireRateLevel)
-            {
-                //TODO: Display not enough points
-            }
-            else
-            {
-                Score -= FireRateUpgradeCost * FireRateLevel;
-                onScoreUpdated.Invoke(Score);
-                ++FireRateLevel;
-                FighterManager.Instance.UpgradeFireRate(FireRateLevel);
-                //TODO: Display success
-            }
+            if (Score < GetUpgradeFireRateCost()) return;
+            Score -= FireRateUpgradeCost * FireRateLevel;
+            onScoreUpdated.Invoke(Score);
+            ++FireRateLevel;
+            FighterManager.Instance.UpgradeFireRate(FireRateLevel);
         }
     }
 }

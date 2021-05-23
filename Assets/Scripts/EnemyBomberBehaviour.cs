@@ -15,9 +15,9 @@ public class EnemyBomberBehaviour : EnemyBehaviour
         _rigidbody.drag = 0;
     }
     
-    private void OnTriggerEnter(Collider other)
+    protected new void OnTriggerEnter(Collider other)
     {
-        print(other.name + " entered");
+        base.OnTriggerEnter(other);
         // Starts dropping bombs on approach to the carrier
         if (other.CompareTag("BomberAttackTrigger"))
         {
@@ -42,8 +42,6 @@ public class EnemyBomberBehaviour : EnemyBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        print(other.name + " exited");
-
         if (other.CompareTag("HardBoundary"))
         {
             // When I reach the outer boundary, destroy me.

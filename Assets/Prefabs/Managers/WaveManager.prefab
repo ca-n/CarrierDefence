@@ -53,6 +53,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   enemyPrefabs:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 6066906421329429361, guid: 786c38e0843fde04a85a6edd37e8f412, type: 3}
+  - {fileID: 6615676586184050249, guid: c7072acad1025f748b5bd63711123515, type: 3}
+  - {fileID: 4112418727659483096, guid: 3a148e6ad9c5bfa4aa931c890e397cb8, type: 3}

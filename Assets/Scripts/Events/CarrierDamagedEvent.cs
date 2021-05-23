@@ -3,7 +3,7 @@
 namespace Events
 {
     [System.Serializable]
-    public class CarrierDamagedEvent : UnityEvent<int>
+    public class CarrierDamagedEvent : UnityEvent<float>
     {
         
     }

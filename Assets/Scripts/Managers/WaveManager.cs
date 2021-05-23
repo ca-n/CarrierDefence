@@ -29,6 +29,7 @@ namespace Managers
             onEnemyDowned.AddListener(UIManager.Instance.UpdateEnemiesRemainingText);
             onWaveChanged.AddListener(UIManager.Instance.UpdateWaveText);
             onWaveCleared.AddListener(UIManager.Instance.ShowWaveClearedText);
+            NextWave();
         }
 
         public void NextWave()
@@ -46,6 +47,7 @@ namespace Managers
             _spawnQueue.Add(enemyPrefabs[0]);
             
             // On multiples of 5, add a harder enemy as well
+            /*
             if (Wave % 5 == 0)
             {
                 _spawnQueue.Add(enemyPrefabs[1]);
@@ -56,6 +58,7 @@ namespace Managers
             {
                 _spawnQueue.Add(enemyPrefabs[2]);
             }
+            */
         }
 
         private IEnumerator SpawnWave()
@@ -78,7 +81,7 @@ namespace Managers
             {
                 edge = Random.insideUnitCircle.normalized * 8000;
             } while (edge.magnitude == 0);
-
+            
             return new Vector3(edge.x, GetHeightByTag(enemyTag), edge.y);
         }
 

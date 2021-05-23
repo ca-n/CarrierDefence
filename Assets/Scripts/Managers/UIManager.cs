@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using Types;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,52 +22,134 @@ namespace Managers
         [SerializeField] private GameObject[] mainMenuHighscoresScores;
 
         [SerializeField] private Text hudScoreText;
-        [SerializeField] private Text hudWaveClearedText;
+        [SerializeField] private GameObject hudWaveCleared;
+        [SerializeField] private Text nextWaveTimeText;
         [SerializeField] private Text hudWaveNumberText;
         [SerializeField] private Text hudEnemiesRemainingText;
-        [SerializeField] private Object hudCarrierHealth;
+        [SerializeField] private Slider hudCarrierHealth;
+        [SerializeField] private GameObject hudSoftBoundaryText;
 
         [SerializeField] private GameObject highscoreText;
         [SerializeField] private Text highscoreNameInputText;
         [SerializeField] private Outline highscoreNameInputOutline;
-        private bool _highlighting = false;
+
+        [SerializeField] private Button upgradeGunsButton;
+        [SerializeField] private Button upgradeBulletsButton;
+        [SerializeField] private Button upgradeFireRateButton;
+        [SerializeField] private Text upgradeGunsCostText;
+        [SerializeField] private Text upgradeBulletsCostText;
+        [SerializeField] private Text upgradeFireRateCostText;
+
+        private bool _highlighting;
+        private bool _betweenWaves;
         private Highscore _bestHighscore;
 
         private void Start()
         {
-            Thread t = new Thread(PopulateHighscores);
-            t.Start();
+            GameManager.Instance.onGameStateChanged.AddListener(HandleGameStateChanged);
+            InstantiateVariables();
         }
 
-        private void OnGameStateChanged(GameState state)
+        public void InstantiateVariables()
+        {
+            _highlighting = false;
+            _betweenWaves = false;
+            PopulateHighscores();
+        }
+
+        private void Update()
+        {
+            if (GameManager.Instance.CurrentGameState == GameState.MainMenu && Input.anyKeyDown)
+            {
+                GameManager.Instance.StartGame();
+            }
+
+            if (Input.GetKeyDown(KeyCode.P) && _betweenWaves && GameManager.Instance.CurrentGameState == GameState.InGame)
+            {
+                GameManager.Instance.OpenUpgradeShop();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape) && _betweenWaves &&
+                GameManager.Instance.CurrentGameState == GameState.UpgradeShop)
+            {
+                GameManager.Instance.ExitUpgradeShop();
+            }
+        }
+
+        private void HandleGameStateChanged(GameState state)
         {
             mainMenu.SetActive(state == GameState.MainMenu);
-            hud.SetActive(state != GameState.MainMenu && state != GameState.UpgradeShop);
+            hud.SetActive(state != GameState.MainMenu);
             pauseMenu.SetActive(state == GameState.PauseMenu);
             dummyCamera.SetActive(state == GameState.MainMenu);
             gameOverScreen.SetActive(state == GameState.GameOver);
             upgradeShop.SetActive(state == GameState.UpgradeShop);
-            if (state == GameState.GameOver) CheckHighscore();
+            if (state == GameState.GameOver)
+            {
+                CheckHighscore();
+                HideSoftBoundaryText();
+                hudWaveCleared.SetActive(false);
+                StopCoroutine(NextWaveCountdown());
+            }
         }
         
-        public void UpdateScoreText(int score)
+        public void HandleScoreUpdated(int score)
         {
-            //TODO: UPDATE SCORE
+            hudScoreText.text = score.ToString();
+            
+            int upgradeGunsCost = ScoreManager.Instance.GetUpgradeGunsCost();
+            bool canUpgradeGuns = score >= upgradeGunsCost;
+            upgradeGunsButton.interactable = canUpgradeGuns;
+            upgradeGunsCostText.text = upgradeGunsCost.ToString();
+            upgradeGunsCostText.color = canUpgradeGuns ? Color.green : Color.red;
+
+            int upgradeBulletsCost = ScoreManager.Instance.GetUpgradeBulletsCost();
+            bool canUpgradeBullets = score >= upgradeBulletsCost;
+            upgradeBulletsButton.interactable = canUpgradeBullets;
+            upgradeBulletsCostText.text = upgradeBulletsCost.ToString();
+            upgradeBulletsCostText.color = canUpgradeBullets ? Color.green : Color.red;
+
+            int upgradeFireRateCost = ScoreManager.Instance.GetUpgradeFireRateCost();
+            bool canUpgradeFireRate = score >= upgradeFireRateCost;
+            upgradeFireRateButton.interactable = canUpgradeFireRate;
+            upgradeFireRateCostText.text = upgradeFireRateCost.ToString();
+            upgradeFireRateCostText.color = canUpgradeFireRate ? Color.green : Color.red;
         }
 
         public void ShowWaveClearedText()
         {
-            //TODO: WAVE CLEARED UI
+            _betweenWaves = true;
+            hudWaveCleared.SetActive(true);
+            StartCoroutine(NextWaveCountdown());
+        }
+
+        public void HandleCarrierDamaged(float healthLeft)
+        {
+            hudCarrierHealth.value = healthLeft;
+        }
+
+        private IEnumerator NextWaveCountdown()
+        {
+            for (int s = 15; s > 0; --s)
+            {
+                nextWaveTimeText.text = s.ToString();
+                yield return new WaitForSeconds(1);
+            }
+            _betweenWaves = false;
+            hudWaveCleared.SetActive(false);
+            WaveManager.Instance.NextWave();
         }
 
         public void UpdateWaveText(int wave, int enemiesRemaining)
         {
-            //TODO: WAVE CHANGED UI
+            hudWaveNumberText.text = wave.ToString();
+            hudEnemiesRemainingText.text = enemiesRemaining.ToString();
         }
 
         public void UpdateEnemiesRemainingText(string enemyTag)
         {
-            //TODO: UPDATE ENEMIES REMAINING
+            int lastRemaining = int.Parse(hudEnemiesRemainingText.text);
+            hudEnemiesRemainingText.text = (--lastRemaining).ToString();
         }
 
         public void OnClickResume()
@@ -96,7 +177,12 @@ namespace Managers
             string name = highscoreNameInputText.text;
             int wave = WaveManager.Instance.Wave;
             int score = ScoreManager.Instance.Score;
-            Highscore.Save(new Highscore(name, wave, score));
+            Highscore hi = new Highscore();
+            hi.name = name;
+            hi.wave = wave;
+            hi.score = score;
+            HighscoreStorage.Save(hi);
+            GameManager.Instance.RestartGame();
         }
 
         private IEnumerator HighlightNameInput()
@@ -107,7 +193,7 @@ namespace Managers
             for (float a = increment; a >= 0; a += increment)
             {
                 highscoreNameInputOutline.effectColor = new Color(1, 0, 0, a);
-                yield return new WaitForSeconds(0.05f);
+                yield return new WaitForSecondsRealtime(0.05f);
                 if (a >= 1) increment *= -1.0f;
             }
             _highlighting = false;
@@ -115,16 +201,16 @@ namespace Managers
 
         private void PopulateHighscores()
         {
-            List<Highscore> highscores = Highscore.LoadAll();
+            List<Highscore> highscores = HighscoreStorage.Load();
             for (int i = 0; i < mainMenuHighscoreNames.Length; ++i)
             {
                 if (i >= highscores.Count) break;
                 Highscore highscore = highscores[i];
-                mainMenuHighscoreNames[i].GetComponent<Text>().text = highscore.Name;
+                mainMenuHighscoreNames[i].GetComponent<Text>().text = highscore.name;
                 mainMenuHighscoreNames[i].SetActive(true);
-                mainMenuHighscoreWaves[i].GetComponent<Text>().text = highscore.Wave.ToString();
+                mainMenuHighscoreWaves[i].GetComponent<Text>().text = highscore.wave.ToString();
                 mainMenuHighscoreWaves[i].SetActive(true);
-                mainMenuHighscoresScores[i].GetComponent<Text>().text = highscore.Score.ToString();
+                mainMenuHighscoresScores[i].GetComponent<Text>().text = highscore.score.ToString();
                 mainMenuHighscoresScores[i].SetActive(true);
             }
             if (highscores.Count != 0) _bestHighscore = highscores[0];
@@ -134,7 +220,22 @@ namespace Managers
         {
             int wave = WaveManager.Instance.Wave;
             int score = ScoreManager.Instance.Score;
-            highscoreText.SetActive(wave > _bestHighscore.Wave || (wave == _bestHighscore.Wave && score > _bestHighscore.Score));
+            highscoreText.SetActive(wave > _bestHighscore.wave || wave == _bestHighscore.wave && score > _bestHighscore.score);
+        }
+
+        public void OnClickExitUpgrades()
+        {
+            GameManager.Instance.ExitUpgradeShop();
+        }
+
+        public void ShowSoftBoundaryText()
+        {
+            hudSoftBoundaryText.SetActive(true);
+        }
+
+        public void HideSoftBoundaryText()
+        {
+            hudSoftBoundaryText.SetActive(false);
         }
     }
 }

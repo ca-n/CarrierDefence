@@ -9,6 +9,8 @@ public class EnemyBehaviour : MonoBehaviour
 {
     [SerializeField] protected int health;
     [SerializeField] protected int speed;
+    [SerializeField] private GameObject fire;
+    [SerializeField] private GameObject explosion;
     protected Rigidbody _rigidbody;
     protected bool crashing;
     
@@ -36,18 +38,21 @@ public class EnemyBehaviour : MonoBehaviour
     {
         crashing = true;
         _rigidbody.useGravity = true;
-        //TODO: Create smoke and flame effect
+        Instantiate(fire, transform);
+        Instantiate(fire, transform);
+        Instantiate(fire, transform);
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Ocean"))
         {
-            Invoke(nameof(Explode), 0.25f);
+            Explode();
         }
 
         if (other.CompareTag("PlayerBullet"))
         {
+            Debug.Log("hit hit");
             health -= FighterManager.Instance.BulletDamage;
             if (!crashing && health <= 0)
             {
@@ -57,9 +62,17 @@ public class EnemyBehaviour : MonoBehaviour
         }
     }
 
+    protected void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            Explode();
+        }
+    }
+
     void Explode()
     {
-        //TODO: Explosion
+        Instantiate(explosion, transform.position, Quaternion.Euler(Vector3.left * 90));
         Destroy(gameObject);
     }
 }

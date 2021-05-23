@@ -23,14 +23,33 @@ namespace Managers
         private int _fireRate;
         private float _speed;
         private bool _firing;
+        private static readonly int EmissionColor = Shader.PropertyToID("_EmissionColor");
+        private AudioSource _audioSource;
+        [SerializeField] private AudioClip fireSound;
+        [SerializeField] private AudioClip explosionSound;
+        [SerializeField] private GameObject explosion;
 
         private void Start()
         {
-            _speed = 0;
+            _speed = 7.5f;
             _firing = false;
             UpgradeGuns(ScoreManager.Instance.GunLevel);
             UpgradeBulletDamage(ScoreManager.Instance.BulletLevel);
             UpgradeFireRate(ScoreManager.Instance.FireRateLevel);
+            _audioSource = GetComponent<AudioSource>();
+            foreach (var thruster in thrusters)
+            {
+                var lr = thruster.AddComponent<LineRenderer>();
+                lr.material = new Material(Shader.Find("Sprites/Default"));
+                lr.startWidth = 2;
+                lr.endWidth = 0;
+                lr.startColor = Color.cyan;
+                lr.endColor = Color.clear;
+                lr.useWorldSpace = false;
+                lr.SetPosition(0, Vector3.zero);
+                lr.SetPosition(1, Vector3.forward * 2);
+                lr.enabled = true;
+            }
         }
 
         public int BulletDamage { get; private set; }
@@ -47,7 +66,7 @@ namespace Managers
                         FireGun(gun);
                     }
                 }
-                yield return new WaitForSeconds(0.5f / _fireRate);
+                yield return new WaitForSeconds(1.0f / (2.0f + _fireRate));
             } while (Input.GetMouseButton(0));
             _firing = false;
         }
@@ -56,10 +75,13 @@ namespace Managers
         {
             GameObject bullet = Instantiate(bulletPrefab, gun.transform.position + gun.transform.up, gun.transform.rotation);
             TrailRenderer tr = bullet.GetComponent<TrailRenderer>();
-            tr.startColor = GetTracerColor();
+            Color c = GetTracerColor();
+            tr.startColor = c;
+            tr.material.SetColor(EmissionColor, c);
             tr.widthMultiplier = 2;
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
-            rb.AddRelativeForce(Random.Range(0f, 1000f), 50000, Random.Range(0f, 1000f));
+            rb.AddRelativeForce(Random.Range(0f, 1000f), 100000, Random.Range(0f, 1000f));
+            _audioSource.PlayOneShot(fireSound);
             Destroy(bullet, 5f);
         }
 
@@ -108,7 +130,7 @@ namespace Managers
 
         private void FixedUpdate()
         {
-            _speed = Mathf.Clamp(_speed - (transform.forward.y * 0.03f), minSpeed, maxSpeed);
+            _speed = Mathf.Clamp(_speed - (transform.forward.y * 0.025f), minSpeed, maxSpeed);
             transform.Translate(Vector3.forward * _speed);
             // X = pitch, Y = yaw, Z = roll
             transform.Rotate(controlSurfaces.MRx * pitchMultiplier, -controlSurfaces.MRy * yawMultiplier, controlSurfaces.MRz * rollMultiplier);
@@ -156,22 +178,23 @@ namespace Managers
 
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log("Trigger enter: " + other.name, this);
             switch (other.gameObject.tag)
             {
+                case "SoftBoundary":
+                    UIManager.Instance.HideSoftBoundaryText();
+                    break;
                 case "Ocean":
-                    Explode();
+                    Invoke(nameof(Explode), 0.25f);
                     break;
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
-            Debug.Log("Trigger exit: " + other.name, this);
             switch (other.gameObject.tag)
             {
                 case "SoftBoundary":
-                    //TODO: SHOW WARNING
+                    UIManager.Instance.ShowSoftBoundaryText();
                     break;
                 case "HardBoundary":
                     Explode();
@@ -181,14 +204,12 @@ namespace Managers
 
         private void OnCollisionEnter(Collision other)
         {
-            Debug.Log("Collision enter: " + other.gameObject.name, this);
             switch (other.gameObject.tag)
             {
                 case "Carrier":
                 case "EnemyAwacs":
                 case "EnemyHawkeye":
                 case "EnemySeahawk":
-                    //TODO: DESTROY US
                     Explode();
                     break;
             }
@@ -196,8 +217,14 @@ namespace Managers
 
         private void Explode()
         {
-            //TODO: Explosion
-            //TODO: Game Over
+            Instantiate(explosion, transform.position, Quaternion.Euler(Vector3.left * 90));
+            _audioSource.PlayOneShot(explosionSound);
+            Invoke(nameof(CallGameOver), 0.1f);
+        }
+
+        private void CallGameOver()
+        {
+            GameManager.Instance.GameOver();
             Destroy(gameObject);
         }
     }

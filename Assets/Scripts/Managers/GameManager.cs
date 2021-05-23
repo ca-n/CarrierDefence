@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mime;
 using Events;
 using Types;
 using UnityEngine;
@@ -8,9 +12,10 @@ namespace Managers
 {
     public class GameManager : MonoSingleton<GameManager>
     {
+        public string HighscorePath { get; private set; }
         public GameStateChangedEvent onGameStateChanged;
         
-        private readonly string GameScene = "Game";
+        private readonly string GameScene = "Ocean";
 
         [SerializeField] private GameObject[] globalPrefabs;
         private List<GameObject> _globalInstances;
@@ -21,6 +26,8 @@ namespace Managers
         private void Start()
         {
             DontDestroyOnLoad(this);
+            HighscorePath = Application.persistentDataPath + "/highscores.dat";
+            Debug.Log(HighscorePath);
             _globalInstances = new List<GameObject>();
             _loadOperations = new List<AsyncOperation>();
             InstantiateGlobalPrefabs();
@@ -110,6 +117,8 @@ namespace Managers
             switch (newGameState)
             {
                 case GameState.PauseMenu:
+                case GameState.UpgradeShop:
+                case GameState.GameOver:
                     Time.timeScale = 0;
                     break;
                 default:
@@ -142,11 +151,20 @@ namespace Managers
             UpdateGameState(GameState.GameOver);
         }
 
+        public void OpenUpgradeShop()
+        {
+            UpdateGameState(GameState.UpgradeShop);
+        }
+
+        public void ExitUpgradeShop()
+        {
+            UpdateGameState(GameState.InGame);
+        }
+
         public void RestartGame()
         {
             UnloadScene(GameScene);
-            ClearGlobalInstances();
-            InstantiateGlobalPrefabs();
+            UIManager.Instance.InstantiateVariables();
             UpdateGameState(GameState.MainMenu);
         }
 

@@ -15,7 +15,7 @@ public class EnemyHelicopterBehaviour : EnemyBehaviour
         _rigidbody.useGravity = false;
         _rigidbody.drag = 0;
         _rigidbody.velocity = transform.forward * speed;
-        transform.Rotate(Vector3.right * 20);
+        transform.Rotate(Vector3.right * 15);
         _attacking = false;
 
     }
@@ -27,7 +27,7 @@ public class EnemyHelicopterBehaviour : EnemyBehaviour
         tailRotor.Rotate(rotorRotation);
         if (crashing)
         {
-            transform.Rotate(Vector3.up);
+            _rigidbody.AddTorque(Vector3.up * 20);
         }
     }
 
@@ -38,7 +38,7 @@ public class EnemyHelicopterBehaviour : EnemyBehaviour
         {
             _attacking = true;
             _rigidbody.velocity = Vector3.zero;
-            transform.Rotate(Vector3.left * 20);
+            transform.Rotate(Vector3.left * 15);
             StartCoroutine(Attack());
         }
     }

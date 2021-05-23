@@ -14,6 +14,7 @@ public class CarrierBehaviour : MonoBehaviour
     private AudioSource _audioSource;
     [SerializeField] private AudioClip rocketExplosion;
     [SerializeField] private GameObject explosion;
+    [SerializeField] private GameObject hugeExplosion;
     
     // Start is called before the first frame update
     void Start()
@@ -62,7 +63,7 @@ public class CarrierBehaviour : MonoBehaviour
 
     private void Explode()
     {
-        //TODO: Explode
+        Instantiate(hugeExplosion, transform.position, Quaternion.Euler(Vector3.left * 90));
         Invoke(nameof(CallGameOver), 0.1f);
     }
 

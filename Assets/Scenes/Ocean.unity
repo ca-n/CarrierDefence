@@ -1072,6 +1072,8 @@ MonoBehaviour:
       m_Calls: []
   rocketExplosion: {fileID: 8300000, guid: f51e493a8b9df094b868413e03a7d0e1, type: 3}
   explosion: {fileID: 1427962332153456, guid: 301583a5af63a494298d60cd9f296909, type: 3}
+  hugeExplosion: {fileID: 1427962332153456, guid: 4710a640bbb6a6e44b337ee674c984ea,
+    type: 3}
 --- !u!82 &731047457
 AudioSource:
   m_ObjectHideFlags: 0

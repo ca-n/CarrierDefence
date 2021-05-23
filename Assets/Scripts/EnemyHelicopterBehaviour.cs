@@ -7,7 +7,7 @@ public class EnemyHelicopterBehaviour : EnemyBehaviour
     [SerializeField] private Transform mainRotor;
     [SerializeField] private Transform tailRotor;
     [SerializeField] private GameObject rocketPrefab;
-    private float _rocketX = 20f;
+    private float _rocketX = 25f;
     private bool _attacking;
     protected new void Start()
     {
@@ -54,7 +54,7 @@ public class EnemyHelicopterBehaviour : EnemyBehaviour
 
     private void FireRocket()
     {
-        Vector3 position = transform.position + new Vector3(_rocketX, 10f, -10f);
+        Vector3 position = transform.position + new Vector3(_rocketX, 0, 0);
         _rocketX *= -1;
         GameObject rocket = Instantiate(rocketPrefab, position, Quaternion.identity);
         rocket.transform.LookAt(Vector3.zero);
